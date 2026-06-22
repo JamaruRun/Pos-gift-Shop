@@ -63,8 +63,8 @@
 ## 🔔 LINE Notification
 - [ ] migration line-worker-schema รันแล้ว (payload/processing/retry)
 - [ ] env LINE_* + CRON_SECRET ตั้งบน Vercel
-- [ ] vercel.json cron ทำงาน (Production)
-- [ ] ขาย → ได้ LINE 🛒 ≤ 1 นาที
+- [ ] vercel.json cron ทำงาน (Production) — **Hobby = วันละครั้ง (0 0 * * *)**
+- [ ] ขาย → เรียก worker ด้วยมือ (curl + CRON_SECRET) → ได้ LINE 🛒 (Hobby); Pro/scheduler = อัตโนมัติ
 - [ ] ยกเลิกบิล → LINE ⚠️ · ปิดกะ → LINE 📊
 - [ ] worker: ไม่มี secret → 401
 - [ ] failed retry backoff ทำงาน (ทดสอบด้วย token ผิดชั่วคราว)
@@ -79,7 +79,7 @@
 1. [ ] เปิดเว็บ → login เจ้าของ
 2. [ ] เปิดกะเงินสด (เงินทอนตั้งต้น)
 3. [ ] ไปหน้าขาย → ค้นหา "มาม่า/โค้ก" → ขาย 1 บิลเงินสด → เห็นเงินทอน
-4. [ ] เจ้าของได้ LINE แจ้งเตือนการขาย 🛒
+4. [ ] เจ้าของได้ LINE แจ้งเตือนการขาย 🛒 (Hobby: เรียก worker ด้วยมือก่อน — `curl -X POST .../api/notifications/process -H "Authorization: Bearer $CRON_SECRET"`)
 5. [ ] ดู Dashboard → "รายได้วันนี้" ขึ้นยอด
 6. [ ] รับของเข้า → สต็อกเพิ่ม
 7. [ ] เพิ่มพนักงาน → logout → login พนักงาน (หมายเหตุ: demo auth ยังไม่ผูก DB)
