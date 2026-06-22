@@ -70,6 +70,7 @@ declare
   v_product     products%rowtype;
   v_qty         numeric(12,3);
   v_line_total  numeric(12,2);
+  v_payload     jsonb;
 begin
   -- ---- 1) validate payment method ----
   if p_payment_method not in ('cash','promptpay') then
@@ -195,8 +196,24 @@ begin
   );
 
   -- ---- 10) notification (pending) — ไม่ส่ง LINE ที่นี่ ----
-  insert into notification_logs (store_id, sale_id, channel, event_type, status)
-  values (p_store_id, v_sale_id, 'line', 'sale', 'pending');
+  -- payload: snapshot ข้อมูลครบสำหรับ worker สร้างข้อความ (ดู docs/line-worker-schema.sql)
+  v_payload := jsonb_build_object(
+    'event_type',     'sale',
+    'sale_id',        v_sale_id,
+    'store_id',       p_store_id,
+    'employee_name',  v_user.full_name,
+    'total_amount',   v_total,
+    'payment_method', p_payment_method,
+    'created_at',     now(),
+    'sale_items', coalesce((
+      select jsonb_agg(jsonb_build_object(
+               'product_name', si.product_name,
+               'qty',          si.qty,
+               'subtotal',     si.line_total))
+      from sale_items si where si.sale_id = v_sale_id), '[]'::jsonb)
+  );
+  insert into notification_logs (store_id, sale_id, channel, event_type, status, payload)
+  values (p_store_id, v_sale_id, 'line', 'sale', 'pending', v_payload);
 
   -- ---- 11) return ----
   return jsonb_build_object(
@@ -241,6 +258,7 @@ declare
   v_sale    sales%rowtype;
   v_item    sale_items%rowtype;
   v_session cash_sessions%rowtype;
+  v_payload jsonb;
 begin
   -- ---- 1) validate reason ----
   if p_void_reason is null or length(trim(p_void_reason)) = 0 then
@@ -319,8 +337,17 @@ begin
   );
 
   -- ---- 8) notification (pending, event_type='void') ----
-  insert into notification_logs (store_id, sale_id, channel, event_type, status)
-  values (v_sale.store_id, p_sale_id, 'line', 'void', 'pending');
+  v_payload := jsonb_build_object(
+    'event_type',    'void',
+    'sale_id',       p_sale_id,
+    'store_id',      v_sale.store_id,
+    'employee_name', v_user.full_name,   -- ผู้ยกเลิก (owner)
+    'total_amount',  v_sale.total,
+    'void_reason',   p_void_reason,
+    'created_at',    now()
+  );
+  insert into notification_logs (store_id, sale_id, channel, event_type, status, payload)
+  values (v_sale.store_id, p_sale_id, 'line', 'void', 'pending', v_payload);
 
   return jsonb_build_object(
     'success', true,

@@ -40,16 +40,18 @@ export default function PosPage() {
   const [summary, setSummary] = useState<CreateSaleResult | null>(null);
 
   // โหลดสินค้าครั้งเดียว แล้วกรองด้วยชื่อฝั่ง client
+  // ส่ง role เพื่อให้พนักงานได้ products_employee (ไม่มี cost_price)
   useEffect(() => {
+    if (!user) return;
     let active = true;
-    fetchProducts()
+    fetchProducts(user.role)
       .then((p) => active && setProducts(p))
       .catch(() => active && setError("โหลดรายการสินค้าไม่สำเร็จ"))
       .finally(() => active && setLoadingProducts(false));
     return () => {
       active = false;
     };
-  }, []);
+  }, [user]);
 
   // เช็คกะเงินสดที่เปิดอยู่ (ใช้กันการขายเงินสดเมื่อยังไม่เปิดกะ)
   useEffect(() => {

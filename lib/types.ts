@@ -14,6 +14,19 @@ export interface UserProfile {
   role: Role; // role_name แบบอ่านง่าย
   role_id: number; // 1 = owner, 2 = employee (ตรงกับ seed roles ใน schema.sql)
   is_active: boolean;
+  last_login_at?: string | null; // ยังไม่ติดตามใน MVP -> แสดง "-"
+}
+
+// ----- Employees CRUD -----
+export interface EmployeeInput {
+  id?: string; // มี = แก้ไข
+  store_id: string;
+  user_id: string; // ผู้ทำรายการ (owner) — ใช้ตรวจสิทธิ์ฝั่ง server
+  full_name: string;
+  username: string;
+  pin?: string; // create: จำเป็น (>=4 หลัก) / edit: เว้นว่าง = ไม่เปลี่ยน
+  role: Role;
+  is_active?: boolean;
 }
 
 export interface Category {

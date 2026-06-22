@@ -136,6 +136,7 @@ declare
   v_session  cash_sessions%rowtype;
   v_expected numeric(12,2);
   v_diff     numeric(12,2);
+  v_payload  jsonb;
 begin
   -- 1) validate actual_cash
   if p_actual_cash is null or p_actual_cash < 0 then
@@ -180,8 +181,17 @@ begin
   );
 
   -- 7) notification (pending) — สรุปกะส่ง LINE ให้ owner
-  insert into notification_logs (store_id, sale_id, channel, event_type, status)
-  values (v_session.store_id, null, 'line', 'cash_close', 'pending');
+  v_payload := jsonb_build_object(
+    'event_type',      'cash_close',
+    'store_id',        v_session.store_id,
+    'cash_session_id', p_cash_session_id,
+    'expected_cash',   v_expected,
+    'actual_cash',     p_actual_cash,
+    'difference',      v_diff,
+    'closed_at',       now()
+  );
+  insert into notification_logs (store_id, sale_id, channel, event_type, status, payload)
+  values (v_session.store_id, null, 'line', 'cash_close', 'pending', v_payload);
 
   return jsonb_build_object(
     'success', true,
