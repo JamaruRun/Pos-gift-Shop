@@ -127,7 +127,9 @@ flowchart LR
 เวลา: {HH:mm}
 ```
 
-ปลายทาง: push message ไปยัง `LINE_OWNER_USER_ID` (เจ้าของร้าน)
+ปลายทาง: push message ไปยังเจ้าของร้าน — worker อ่าน `settings.line_owner_user_id` ของ store ก่อน, ถ้าไม่มี fallback `LINE_OWNER_USER_ID` (env)
+
+**Worker เคารพ flag เปิด/ปิด (ตั้งใน /settings):** ก่อนส่ง เช็ค `line_notify_{sale|void|cash_close}_enabled` ของ store — ถ้าปิด → mark `sent` (skipped, ไม่ส่ง ไม่ retry). ไม่มีค่า = ถือว่าเปิด (backward compatible)
 
 ---
 

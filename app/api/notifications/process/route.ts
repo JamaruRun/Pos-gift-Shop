@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const nowIso = new Date().toISOString();
   const { data: due, error: dueErr } = await supabase
     .from("notification_logs")
-    .select("id, event_type, payload, retry_count, status, next_retry_at")
+    .select("id, store_id, event_type, payload, retry_count, status, next_retry_at")
     .in("status", ["pending", "failed"])
     .lt("retry_count", MAX_RETRY)
     .or(`next_retry_at.is.null,next_retry_at.lte.${nowIso}`)
@@ -58,6 +58,8 @@ export async function POST(req: Request) {
 
   let sent = 0;
   let failed = 0;
+  let skipped = 0;
+  const settingsCache = new Map<string, StoreLineSettings>();
 
   for (const row of due ?? []) {
     // ---- 3) claim: pending/failed -> processing (กันแย่งกันทำ) ----
@@ -71,10 +73,33 @@ export async function POST(req: Request) {
 
     if (!claimed) continue; // instance อื่นจองไปแล้ว
 
+    // ---- 3.5) อ่าน settings ของ store + เช็ค flag เปิด/ปิด ----
+    const st = await getStoreLineSettings(supabase, row.store_id, settingsCache);
+    const enabled =
+      row.event_type === "sale"
+        ? st.sale
+        : row.event_type === "void"
+          ? st.void_
+          : row.event_type === "cash_close"
+            ? st.cash_close
+            : true;
+    if (!enabled) {
+      // ปิดการแจ้งเตือนชนิดนี้ -> ถือว่าจัดการแล้ว ไม่ส่ง ไม่ retry
+      await supabase
+        .from("notification_logs")
+        .update({ status: "sent", sent_at: new Date().toISOString(), error: "skipped (disabled)" })
+        .eq("id", row.id);
+      skipped++;
+      continue;
+    }
+
+    // ปลายทาง: settings.line_owner_user_id > env LINE_OWNER_USER_ID
+    const to = st.owner_user_id || ownerUserId;
+
     // ---- 4) build + send ----
     try {
       const message = buildLineMessage(row as NotificationRow);
-      await sendLinePushMessage(ownerUserId, message);
+      await sendLinePushMessage(to, message);
       await supabase
         .from("notification_logs")
         .update({
@@ -94,8 +119,45 @@ export async function POST(req: Request) {
     ok: true,
     processed: (due ?? []).length,
     sent,
+    skipped,
     failed,
   });
+}
+
+interface StoreLineSettings {
+  owner_user_id: string | null;
+  sale: boolean;
+  void_: boolean;
+  cash_close: boolean;
+}
+
+// อ่าน LINE settings ต่อ store (มี cache ภายในรอบ) — fallback enabled=true ถ้าไม่มีค่า
+async function getStoreLineSettings(
+  supabase: ReturnType<typeof createServiceClient>,
+  storeId: string,
+  cache: Map<string, StoreLineSettings>
+): Promise<StoreLineSettings> {
+  const cached = cache.get(storeId);
+  if (cached) return cached;
+  const { data } = await supabase
+    .from("settings")
+    .select("key, value")
+    .eq("store_id", storeId)
+    .in("key", [
+      "line_owner_user_id",
+      "line_notify_sale_enabled",
+      "line_notify_void_enabled",
+      "line_notify_cash_close_enabled",
+    ]);
+  const map = new Map((data ?? []).map((r) => [r.key, r.value]));
+  const s: StoreLineSettings = {
+    owner_user_id: (map.get("line_owner_user_id") || "").trim() || null,
+    sale: map.get("line_notify_sale_enabled") !== "false",
+    void_: map.get("line_notify_void_enabled") !== "false",
+    cash_close: map.get("line_notify_cash_close_enabled") !== "false",
+  };
+  cache.set(storeId, s);
+  return s;
 }
 
 // คืนแถว processing ที่ค้างเกิน STUCK_MINUTES -> pending/failed + retry_count++

@@ -17,6 +17,14 @@ export interface UserProfile {
   last_login_at?: string | null; // ยังไม่ติดตามใน MVP -> แสดง "-"
 }
 
+// ----- LINE notification settings -----
+export interface LineSettings {
+  line_owner_user_id: string;
+  line_notify_sale_enabled: boolean;
+  line_notify_void_enabled: boolean;
+  line_notify_cash_close_enabled: boolean;
+}
+
 // ----- Employees CRUD -----
 export interface EmployeeInput {
   id?: string; // มี = แก้ไข

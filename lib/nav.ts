@@ -8,6 +8,7 @@ import {
   Users,
   AlertTriangle,
   BarChart3,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,6 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/reports", label: "รายงาน", icon: BarChart3, ownerOnly: true },
   { href: "/cash-session", label: "กะเงินสด", icon: Wallet, ownerOnly: true },
   { href: "/employees", label: "พนักงาน", icon: Users, ownerOnly: true },
+  { href: "/settings", label: "ตั้งค่า", icon: Settings, ownerOnly: true },
 ];
 
 export function visibleNavItems(role: Role | undefined): NavItem[] {
