@@ -4,23 +4,24 @@
 
 @layer base {
   :root {
-    --background: 160 30% 97%;        /* พื้นหลังเขียวอมเทาอ่อน สบายตา */
-    --foreground: 200 20% 14%;
+    --background: 160 30% 97%;
+    --foreground: 200 24% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 200 20% 14%;
-    --primary: 158 64% 38%;           /* เขียวสด = หลัก/ปกติ */
+    --card-foreground: 200 24% 12%;
+    --primary: 158 64% 36%;
     --primary-foreground: 0 0% 100%;
+    --primary-dark: 162 70% 26%;
     --secondary: 160 20% 93%;
     --secondary-foreground: 200 20% 14%;
-    --muted: 160 18% 94%;
-    --muted-foreground: 200 12% 45%;
-    --accent: 158 40% 92%;
-    --accent-foreground: 158 64% 24%;
-    --destructive: 0 74% 52%;         /* แดง = ของหมด/ผิดปกติ */
+    --muted: 160 18% 95%;
+    --muted-foreground: 200 10% 46%;
+    --accent: 158 44% 92%;
+    --accent-foreground: 158 64% 22%;
+    --destructive: 0 74% 52%;
     --destructive-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;            /* ส้ม = เตือน */
-    --border: 160 16% 88%;
-    --input: 160 16% 84%;
+    --warning: 36 96% 48%;
+    --border: 160 16% 89%;
+    --input: 160 16% 85%;
     --ring: 158 64% 38%;
     --radius: 1rem;
   }
@@ -31,18 +32,46 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: ui-sans-serif, system-ui, "Sarabun", "Noto Sans Thai", sans-serif;
+    @apply text-foreground antialiased;
+    font-family: "Prompt", ui-sans-serif, system-ui, "Noto Sans Thai", sans-serif;
     -webkit-tap-highlight-color: transparent;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, hsl(158 64% 92% / 0.7), transparent),
+      radial-gradient(900px 500px at -10% 110%, hsl(158 50% 90% / 0.6), transparent),
+      hsl(var(--background));
+    background-attachment: fixed;
   }
-  /* รองรับ safe-area บนมือถือ (bottom nav) */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
 @layer components {
-  .card-soft {
-    @apply rounded-2xl border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.08)];
+  /* ไล่เฉดเขียวหลัก — ใช้กับ hero/ปุ่มเด่น */
+  .gradient-primary {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary-dark)) 100%
+    );
+  }
+  .text-gradient {
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glass {
+    background: hsl(0 0% 100% / 0.7);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .shadow-soft {
+    box-shadow:
+      0 1px 3px rgb(0 0 0 / 0.04),
+      0 10px 30px -16px rgb(16 70 50 / 0.18);
+  }
+  .shadow-hero {
+    box-shadow: 0 18px 40px -18px hsl(var(--primary) / 0.55);
   }
 }

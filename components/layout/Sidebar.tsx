@@ -19,7 +19,7 @@ export function Sidebar({
   return (
     <nav className="flex h-full flex-col gap-1 p-3">
       <div className="mb-2 flex items-center gap-3 px-2 py-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-xl text-primary-foreground shadow-sm">
+        <div className="gradient-primary flex h-11 w-11 items-center justify-center rounded-2xl text-xl text-primary-foreground shadow-md">
           🏪
         </div>
         <div>
@@ -39,7 +39,7 @@ export function Sidebar({
             className={cn(
               "group flex items-center gap-3 rounded-xl px-3 py-3 text-base font-medium transition-all",
               active
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "gradient-primary text-primary-foreground shadow-md"
                 : "text-foreground hover:bg-accent"
             )}
           >

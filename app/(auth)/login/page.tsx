@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Delete } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -58,82 +57,105 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-sm p-6">
-        <div className="mb-6 text-center">
-          <p className="text-3xl">🏪</p>
-          <h1 className="mt-2 text-2xl font-bold">ร้าน Gift</h1>
-          <p className="text-sm text-muted-foreground">เข้าสู่ระบบเพื่อเริ่มขาย</p>
-        </div>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+      {/* พื้นหลังไล่เฉด + แสง */}
+      <div className="absolute inset-0 gradient-primary" />
+      <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+      <div className="absolute -bottom-24 -right-16 h-96 w-96 rounded-full bg-black/10 blur-3xl" />
 
-        <div className="space-y-2">
-          <Label htmlFor="username">ชื่อผู้ใช้</Label>
-          <Input
-            id="username"
-            placeholder="เช่น gift หรือ somchai"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoComplete="username"
-          />
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <Label>รหัส PIN</Label>
-          {/* แสดงจุด PIN */}
-          <div className="flex justify-center gap-3 py-2">
-            {Array.from({ length: PIN_LENGTH }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "h-4 w-4 rounded-full border-2",
-                  i < pin.length ? "border-primary bg-primary" : "border-input"
-                )}
-              />
-            ))}
+      <div className="relative w-full max-w-sm">
+        {/* แบรนด์ */}
+        <div className="mb-6 text-center text-white">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white/15 text-4xl shadow-lg backdrop-blur">
+            🏪
           </div>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight">ร้าน Gift</h1>
+          <p className="mt-1 text-sm text-white/80">ระบบขายหน้าร้าน + จัดการสต็อก</p>
         </div>
 
-        {/* แป้นตัวเลขปุ่มใหญ่ */}
-        <div className="mt-3 grid grid-cols-3 gap-3">
-          {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-            <Button
-              key={d}
-              variant="outline"
-              size="xl"
-              onClick={() => pressDigit(d)}
+        <Card className="glass border-white/40 p-6 shadow-2xl">
+          <div className="space-y-2">
+            <Label htmlFor="username">ชื่อผู้ใช้</Label>
+            <Input
+              id="username"
+              placeholder="เช่น gift หรือ somchai"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              className="h-12 bg-white/80"
+            />
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <Label>รหัส PIN</Label>
+            <div className="flex justify-center gap-3 py-2">
+              {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "h-3.5 w-3.5 rounded-full border-2 transition-all",
+                    i < pin.length
+                      ? "scale-110 border-primary bg-primary"
+                      : "border-muted-foreground/30"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* แป้นตัวเลข */}
+          <div className="mt-3 grid grid-cols-3 gap-2.5">
+            {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => pressDigit(d)}
+                className="h-14 rounded-2xl bg-white/70 text-xl font-semibold text-foreground shadow-sm transition-all hover:bg-white active:scale-95"
+              >
+                {d}
+              </button>
+            ))}
+            <button
               type="button"
+              onClick={backspace}
+              className="flex h-14 items-center justify-center rounded-2xl text-muted-foreground transition-all hover:bg-white/50 active:scale-95"
             >
-              {d}
-            </Button>
-          ))}
-          <Button variant="ghost" size="xl" onClick={backspace} type="button">
-            <Delete className="h-6 w-6" />
-          </Button>
-          <Button variant="outline" size="xl" onClick={() => pressDigit("0")} type="button">
-            0
-          </Button>
-          <Button
-            size="xl"
-            onClick={handleSubmit}
-            disabled={loading}
-            type="button"
-          >
-            {loading ? "..." : "เข้า"}
-          </Button>
-        </div>
+              <Delete className="h-6 w-6" />
+            </button>
+            <button
+              type="button"
+              onClick={() => pressDigit("0")}
+              className="h-14 rounded-2xl bg-white/70 text-xl font-semibold text-foreground shadow-sm transition-all hover:bg-white active:scale-95"
+            >
+              0
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading}
+              className="gradient-primary flex h-14 items-center justify-center rounded-2xl text-lg font-bold text-white shadow-md transition-all hover:opacity-95 active:scale-95 disabled:opacity-60"
+            >
+              {loading ? "..." : "เข้า"}
+            </button>
+          </div>
 
-        {error && (
-          <p className="mt-4 rounded-lg bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="mt-4 rounded-xl bg-destructive/10 px-3 py-2 text-center text-sm font-medium text-destructive">
+              {error}
+            </p>
+          )}
 
-        {isMockMode() && (
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            โหมดทดลอง: เจ้าของ <b>gift / 1111</b> · พนักงาน <b>somchai / 2222</b>
-          </p>
-        )}
-      </Card>
+          {isMockMode() && (
+            <p className="mt-4 rounded-xl bg-muted/60 px-3 py-2 text-center text-xs text-muted-foreground">
+              โหมดทดลอง: เจ้าของ <b>gift / 1111</b> · พนักงาน <b>somchai / 2222</b>
+            </p>
+          )}
+        </Card>
+
+        <p className="mt-4 text-center text-xs text-white/70">
+          ใช้งานง่าย · ปลอดภัย · ดูยอดขายแบบเรียลไทม์
+        </p>
+      </div>
     </div>
   );
 }

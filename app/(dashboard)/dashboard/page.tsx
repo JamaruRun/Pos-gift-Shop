@@ -43,8 +43,8 @@ function QuickAction({
       className={
         "flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-center text-sm font-semibold shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] " +
         (primary
-          ? "border-transparent bg-primary text-primary-foreground"
-          : "bg-card hover:border-primary/40")
+          ? "gradient-primary shadow-hero border-transparent text-primary-foreground"
+          : "bg-card shadow-soft hover:border-primary/40")
       }
     >
       <Icon className="h-6 w-6" />
@@ -116,7 +116,7 @@ function DashboardContent() {
           return (
             <Card
               key={c.label}
-              className={hero ? "border-transparent bg-primary text-primary-foreground" : ""}
+              className={hero ? "gradient-primary shadow-hero border-transparent text-primary-foreground" : ""}
             >
               <CardContent className="pt-5">
                 <div className="flex items-center justify-between">
