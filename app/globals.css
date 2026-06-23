@@ -4,24 +4,25 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 160 30% 97%;        /* พื้นหลังเขียวอมเทาอ่อน สบายตา */
+    --foreground: 200 20% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 142 71% 35%;          /* เขียว = ปุ่มหลัก/ปกติ */
+    --card-foreground: 200 20% 14%;
+    --primary: 158 64% 38%;           /* เขียวสด = หลัก/ปกติ */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 94%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 94%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 92%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 72% 51%;        /* แดง = ของหมด/ผิดปกติ */
+    --secondary: 160 20% 93%;
+    --secondary-foreground: 200 20% 14%;
+    --muted: 160 18% 94%;
+    --muted-foreground: 200 12% 45%;
+    --accent: 158 40% 92%;
+    --accent-foreground: 158 64% 24%;
+    --destructive: 0 74% 52%;         /* แดง = ของหมด/ผิดปกติ */
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 88%;
-    --input: 214 32% 84%;
-    --ring: 142 71% 35%;
-    --radius: 0.75rem;
+    --warning: 38 92% 50%;            /* ส้ม = เตือน */
+    --border: 160 16% 88%;
+    --input: 160 16% 84%;
+    --ring: 158 64% 38%;
+    --radius: 1rem;
   }
 }
 
@@ -30,7 +31,18 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: ui-sans-serif, system-ui, "Sarabun", "Noto Sans Thai", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* รองรับ safe-area บนมือถือ (bottom nav) */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@layer components {
+  .card-soft {
+    @apply rounded-2xl border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.08)];
   }
 }

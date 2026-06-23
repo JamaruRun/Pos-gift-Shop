@@ -18,10 +18,16 @@ export function Sidebar({
 
   return (
     <nav className="flex h-full flex-col gap-1 p-3">
-      <div className="px-2 py-4">
-        <p className="text-lg font-bold">🏪 ร้าน Gift</p>
-        <p className="text-sm text-muted-foreground">ระบบขาย + สต็อก</p>
+      <div className="mb-2 flex items-center gap-3 px-2 py-4">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-xl text-primary-foreground shadow-sm">
+          🏪
+        </div>
+        <div>
+          <p className="text-base font-bold leading-tight">ร้าน Gift</p>
+          <p className="text-xs text-muted-foreground">ระบบขาย + สต็อก</p>
+        </div>
       </div>
+
       {items.map((item) => {
         const active = pathname === item.href;
         const Icon = item.icon;
@@ -31,13 +37,20 @@ export function Sidebar({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-colors",
+              "group flex items-center gap-3 rounded-xl px-3 py-3 text-base font-medium transition-all",
               active
-                ? "bg-primary text-primary-foreground"
+                ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-foreground hover:bg-accent"
             )}
           >
-            <Icon className="h-5 w-5 shrink-0" />
+            <span
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                active ? "bg-white/20" : "bg-muted group-hover:bg-background"
+              )}
+            >
+              <Icon className="h-5 w-5 shrink-0" />
+            </span>
             {item.label}
           </Link>
         );

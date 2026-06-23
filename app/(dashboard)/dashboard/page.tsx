@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TrendingUp, Wallet, AlertTriangle, Coins } from "lucide-react";
+import Link from "next/link";
+import {
+  TrendingUp,
+  Wallet,
+  AlertTriangle,
+  Coins,
+  ShoppingCart,
+  PackagePlus,
+  BarChart3,
+  type LucideIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingBlock } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -15,6 +25,33 @@ import {
   getRecentActivities,
 } from "@/lib/reports";
 import type { DashboardToday, RecentActivity, TopProduct } from "@/lib/types";
+
+function QuickAction({
+  href,
+  label,
+  icon: Icon,
+  primary,
+}: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={
+        "flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-center text-sm font-semibold shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.98] " +
+        (primary
+          ? "border-transparent bg-primary text-primary-foreground"
+          : "bg-card hover:border-primary/40")
+      }
+    >
+      <Icon className="h-6 w-6" />
+      {label}
+    </Link>
+  );
+}
 
 export default function DashboardPage() {
   return (
@@ -63,18 +100,40 @@ function DashboardContent() {
     <div>
       <PageHeader title="แดชบอร์ด" description="ภาพรวมร้านวันนี้" />
 
+      {/* Quick Actions */}
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <QuickAction href="/pos" label="ขายสินค้า" icon={ShoppingCart} primary />
+        <QuickAction href="/cash-session" label="กะเงินสด" icon={Wallet} />
+        <QuickAction href="/products" label="รับของเข้า" icon={PackagePlus} />
+        <QuickAction href="/reports" label="รายงาน" icon={BarChart3} />
+      </div>
+
       {/* การ์ด 4 ใบ — รายได้วันนี้ เด่นสุด */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c, i) => {
           const Icon = c.icon;
+          const hero = i === 0;
           return (
-            <Card key={c.label} className={i === 0 ? "ring-2 ring-primary/40" : ""}>
+            <Card
+              key={c.label}
+              className={hero ? "border-transparent bg-primary text-primary-foreground" : ""}
+            >
               <CardContent className="pt-5">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{c.label}</p>
-                  <Icon className={`h-5 w-5 ${c.accent}`} />
+                  <p className={hero ? "text-sm text-primary-foreground/80" : "text-sm text-muted-foreground"}>
+                    {c.label}
+                  </p>
+                  <span
+                    className={
+                      hero
+                        ? "flex h-9 w-9 items-center justify-center rounded-xl bg-white/20"
+                        : ""
+                    }
+                  >
+                    <Icon className={`h-5 w-5 ${hero ? "text-primary-foreground" : c.accent}`} />
+                  </span>
                 </div>
-                <p className={`mt-2 ${i === 0 ? "text-3xl" : "text-2xl"} font-bold ${c.accent}`}>
+                <p className={`mt-2 font-bold ${hero ? "text-3xl text-primary-foreground" : `text-2xl ${c.accent}`}`}>
                   {c.value}
                 </p>
               </CardContent>
